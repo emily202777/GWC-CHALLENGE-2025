@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- External CSS -->
+</head>
+<body>
+
+<header>
+    <h1>Your Dashboard <span id="currentDate"></span></h1>
+</header>
+
+<div class="button-container">
+    <button onclick="toggleActivitiesRectangle()" class="btn">Log an Activity</button>
+    <button onclick="toggleMetricsRectangle()" class="btn">Metrics</button>
+    <button onclick="toggleWorld()" class="btn">Your World</button>
+    <button onclick="toggleRecommendations()" class="btn">Magic Recommendations</button>
+</div>
+
+<div id="activities-container"></div>
+<div id="metrics-container"></div>
+<div id="world-container"></div>
+<div id="recommendations-container"></div>
+
+<script src="script.js"></script> <!-- External JavaScript -->
+</body>
+</html>
