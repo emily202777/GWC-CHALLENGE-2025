@@ -1,0 +1,161 @@
+/* Universal reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #d8f9f4;
+    color: #1d574c;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styling */
+h1 {
+    font-size: 24px;
+    margin-top: 30px;
+    font-weight: 700;
+}
+
+/* Button styling */
+.button-container {
+    margin-top: 20px;
+}
+
+.btn {
+    background-color: #43d6b9;
+    color: #1d574c;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+}
+
+/* Rectangle styling */
+.rectangle {
+    width: 350px;
+    background: #1d574c;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Input box and save button container */
+.input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-box {
+    width: 70%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #fff;
+    text-align: center;
+    font-size: 14px;
+}
+
+.save-btn {
+    background-color: #43d6b9;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+/* Activity list */
+ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+li {
+    background: white;
+    color: #1d574c;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    width: 90%;
+    margin: 5px auto;
+}
+
+/* Delete button */
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Metrics Box */
+.metrics-box {
+    width: 350px;
+    height: auto;
+    background: #1d574c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Inner Rectangles */
+.metrics-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.small-rectangle {
+    width: 100px;
+    height: 80px;
+    background: white;
+    color: #1d574c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 10px;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.maximize-btn {
+    background-color: #43d6b9;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.maximize-btn:hover {
+    background-color: #e68900;
+}
