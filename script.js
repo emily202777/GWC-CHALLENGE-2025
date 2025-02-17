@@ -18,7 +18,22 @@ function displayCurrentDate() {
 }
 
 // Call this function when the page loads
-document.addEventListener("DOMContentLoaded", displayCurrentDate);
+document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date();
+    
+    let formattedDate = today.toLocaleDateString("en-US", { 
+        month: "long", 
+        day: "numeric", 
+        year: "numeric" 
+    });
+
+    let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let joinDate = "2/12/2025"; // Static for now, can be dynamically set
+
+    document.getElementById("currentDate").textContent = formattedDate;
+    document.getElementById("timeZone").textContent = timeZone;
+    document.getElementById("joinDate").textContent = joinDate;
+});
 
 // Function to update streak logging
 function updateStreak() {
@@ -59,8 +74,31 @@ function displayStreak() {
     }
 }
 
-// Function to toggle the metrics rectangle
-function toggleMetricsRectangle() {
+// Function to dynamically toggle and position sections below buttons
+function toggleSection(sectionId, button) {
+    let section = document.getElementById(sectionId);
+
+    // If the section is already displayed, hide it
+    if (section.style.display === "block") {
+        section.style.display = "none";
+        return;
+    }
+
+    // Hide all other sections before displaying the new one
+    document.querySelectorAll(".dynamic-section").forEach(sec => sec.style.display = "none");
+
+    // Get button position
+    let buttonRect = button.getBoundingClientRect();
+
+    // Set position below the button
+    section.style.top = `${window.scrollY + buttonRect.bottom + 20}px`; // Adds space below the button
+    section.style.left = "50%";
+    section.style.transform = "translateX(-50%)";
+    section.style.display = "block"; // Show the section
+}
+
+// Function to toggle the metrics section
+function toggleMetricsRectangle(button) {
     let container = document.getElementById("metrics-container");
 
     if (container.innerHTML === "") {
@@ -75,14 +113,14 @@ function toggleMetricsRectangle() {
             </div>
         `;
 
-        displayStreak(); // Update streak count in the UI
-    } else {
-        container.innerHTML = "";
+        displayStreak();
     }
+
+    toggleSection("metrics-container", button);
 }
 
 // Function to toggle the input field for activity logging
-function toggleActivitiesRectangle() {
+function toggleActivitiesRectangle(button) {
     let container = document.getElementById("activities-container");
 
     if (container.innerHTML === "") {
@@ -96,88 +134,14 @@ function toggleActivitiesRectangle() {
             </div>
         `;
 
-        displayActivities(); // Display stored activities
-    } else {
-        container.innerHTML = "";
-    }
-}
-
-// Function to save the activity
-function saveActivity() {
-    let input = document.getElementById("activityInput").value.trim();
-    let todayStr = new Date().toISOString().split("T")[0]; // Get today's date as "YYYY-MM-DD"
-
-    if (input !== "") {
-        let activities = JSON.parse(localStorage.getItem("activities")) || [];
-
-        // Add new activity with timestamp
-        activities.unshift({ text: input, date: todayStr }); // Store activity with date
-        localStorage.setItem("activities", JSON.stringify(activities));
-
-        // Check if it's the first activity logged today
-        let lastLogDate = localStorage.getItem("lastLogDate");
-
-        if (lastLogDate !== todayStr) {
-            updateStreak(); // Increase streak only if it's the first log of the day
-        }
-
-        displayActivities(); // Refresh list to show new item first
-        document.getElementById("activityInput").value = ""; // Clear input field
-    } else {
-        alert("Please enter an activity.");
-    }
-}
-
-// Function to delete an activity and reset streak if needed
-function deleteActivity(index) {
-    let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    let todayStr = new Date().toISOString().split("T")[0];
-
-    // Remove the selected activity
-    activities.splice(index, 1);
-    localStorage.setItem("activities", JSON.stringify(activities));
-
-    // Check if there are any activities left for today
-    let hasActivitiesToday = activities.some(activity => activity.date === todayStr);
-
-    if (!hasActivitiesToday) {
-        // No activities left for today → Reset streak to 0
-        streak = 0;
-        localStorage.setItem("streak", streak);
-        localStorage.setItem("lastLogDate", ""); // Clear last log date
+        displayActivities();
     }
 
-    displayActivities(); // Refresh displayed list
-    displayStreak(); // Update streak display
-}
-
-// Function to display the stored activities inside the rectangle
-function displayActivities() {
-    let activityList = document.getElementById("activityList");
-    if (activityList) {
-        activityList.innerHTML = ""; // Clear previous list
-        let activities = JSON.parse(localStorage.getItem("activities")) || [];
-
-        activities.forEach((activity, index) => {
-            let li = document.createElement("li");
-            li.textContent = activity.text; // Display activity text
-
-            // Add a delete button
-            let deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "❌";
-            deleteBtn.className = "delete-btn";
-            deleteBtn.onclick = function () {
-                deleteActivity(index);
-            };
-
-            li.appendChild(deleteBtn);
-            activityList.appendChild(li);
-        });
-    }
+    toggleSection("activities-container", button);
 }
 
 // Function to toggle the "Your World" section
-function toggleWorld() {
+function toggleWorld(button) {
     let container = document.getElementById("world-container");
 
     if (container.innerHTML === "") {
@@ -187,18 +151,126 @@ function toggleWorld() {
                 <button class="maximize-btn" onclick="window.location.href='3d-world.html'">Maximize</button>
             </div>
         `;
-    } else {
-        container.innerHTML = "";
     }
-}
 
+    toggleSection("world-container", button);
+}
 
 // Function to toggle the "Magic Recommendations" section
-function toggleRecommendations() {
+function toggleRecommendations(button) {
     let container = document.getElementById("recommendations-container");
+
     if (container.innerHTML === "") {
-        container.innerHTML = '<div class="rectangle">recommendations text container</div>';
-    } else {
-        container.innerHTML = "";
+        container.innerHTML = `<div class="rectangle">recommendations text container</div>`;
+    }
+
+    toggleSection("recommendations-container", button);
+}
+
+function loadUsername() {
+    let savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+        document.getElementById("username").textContent = savedUsername;
     }
 }
+
+// Function to edit the username
+function editUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+
+    usernameInput.value = usernameSpan.textContent; // Set input value to current username
+    usernameSpan.style.display = "none"; // Hide username text
+    usernameInput.style.display = "inline-block"; // Show input field
+    usernameInput.focus(); // Focus on input
+
+    // Save changes when pressing Enter or clicking outside
+    usernameInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            saveUsername();
+        }
+    });
+
+    usernameInput.addEventListener("blur", saveUsername);
+}
+
+// Function to save username and store it in localStorage
+function saveUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+
+    if (usernameInput.value.trim() !== "") {
+        let newUsername = usernameInput.value.trim();
+        usernameSpan.textContent = newUsername; // Update username
+        localStorage.setItem("username", newUsername); // Save to localStorage
+    }
+
+    usernameSpan.style.display = "inline"; // Show username text
+    usernameInput.style.display = "none"; // Hide input field
+}
+
+// Load username when the page loads
+window.onload = function() {
+    loadUsername();
+};
+
+// Function to load saved username and join date from localStorage
+function loadUserData() {
+    let savedUsername = localStorage.getItem("username");
+    let joinDate = localStorage.getItem("joinDate");
+
+    if (savedUsername) {
+        document.getElementById("username").textContent = savedUsername;
+    }
+
+    if (joinDate) {
+        document.getElementById("join-date").textContent = `Joined: ${joinDate}`;
+    }
+}
+
+// Function to edit the username
+function editUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+
+    usernameInput.value = usernameSpan.textContent; // Set input value to current username
+    usernameSpan.style.display = "none"; // Hide username text
+    usernameInput.style.display = "inline-block"; // Show input field
+    usernameInput.focus(); // Focus on input
+
+    // Save changes when pressing Enter or clicking outside
+    usernameInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            saveUsername();
+        }
+    });
+
+    usernameInput.addEventListener("blur", saveUsername);
+}
+
+// Function to save username and store it in localStorage
+function saveUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+
+    if (usernameInput.value.trim() !== "") {
+        let newUsername = usernameInput.value.trim();
+        usernameSpan.textContent = newUsername; // Update username
+        localStorage.setItem("username", newUsername); // Save to localStorage
+
+        // Check if a join date already exists
+        if (!localStorage.getItem("joinDate")) {
+            let currentDate = new Date().toLocaleDateString(); // Format: MM/DD/YYYY or locale format
+            localStorage.setItem("joinDate", currentDate); // Save the first edit date as join date
+            document.getElementById("join-date").textContent = `Joined: ${currentDate}`;
+        }
+    }
+
+    usernameSpan.style.display = "inline"; // Show username text
+    usernameInput.style.display = "none"; // Hide input field
+}
+
+// Load user data when the page loads
+window.onload = function() {
+    loadUserData();
+};
