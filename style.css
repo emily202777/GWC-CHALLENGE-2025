@@ -5,20 +5,173 @@
     box-sizing: border-box;
 }
 
-/* Body styling */
+html, body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+}
+
+
+
+/* Fix the mountains image at the bottom */
+.mountains-container {
+    position: fixed; /* Sticks to the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: -1; /* Keep it behind other elements */
+}
+
+/* Ensure the mountains image stretches fully */
+.mountains {
+    width: 100%; /* Make it fill the width */
+    height: auto; /* Keep aspect ratio */
+    display: block;
+}
+
+/* Position the pencil icon */
+/* Position the pencil icon next to "username" */
+.edit-icon {
+    width: 16px; /* Adjust icon size */
+    height: auto;
+    margin-left: 8px; /* Space from username */
+    vertical-align: middle; /* Align with text */
+    cursor: pointer; /* Indicate it's clickable */
+    opacity: 0.8; /* Slight transparency */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.edit-icon:hover {
+    opacity: 1; /* Fully visible on hover */
+}
+
+/* Body Styling - REMOVE background image */
 body {
+    cursor: url('flower.png'), auto;
     font-family: 'DM Sans', sans-serif;
-    background-color: #d8f9f4;
+    background-color: #d8f9f4; /* Keep background color */
     color: #1d574c;
     text-align: center;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+
+/* Dashboard Header - Align to Left */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Align items vertically */
+    position: absolute;
+    top: 20px;
+    left: 100px;
+    width: calc(100% - 160px);
+    text-align: left;
+}
+
+/* Dashboard Title Styling */
+.dashboard-info h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d574c;
+    margin-bottom: 20px; /* Adds space below "Your Dashboard" */
+}
+
+/* User Information Styling */
+#userDetails {
+    font-size: 20px;
+    font-weight: 400;
+    color: #1d574c;
+    line-height: 1.8; /* Increases spacing between lines */
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    position: absolute;
+    top: 50px;
+    left: 680px; /* Adjust for centering */
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    position: absolute;
+    top: 50px;
+    left: 550px; /* Move it more to the left */
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Increase spacing between buttons */
+}
+
+.btn {
+    background-color: #43d6b9;
+    color: #1d574c;
+    padding: 15px 40px; /* Make buttons larger */
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 20px; /* Increase text size */
+    text-align: center;
+    width: 500px; /* Make the buttons wider */
+    height: 100px; /* Make the buttons wider */
+}
+
+.btn:hover {
+    background-color: #38c2a5; /* Slightly darker hover effect */
+}
+
+
+
+/* Cloud images container - Moves behind all other elements */
+.cloud-container {
+    position: absolute;
+    width: 100%;
+    top: -20px; /* Moves clouds higher */
+    left: 0;
+    display: flex;
+    justify-content: space-between; /* Spreads clouds apart */
+    pointer-events: none; /* Prevents interaction issues */
+    z-index: -1; /* Moves clouds behind other elements */
+}
+
+/* Left Cloud - Bigger, Flipped, and Custom Positioning */
+.cloud-left {
+    position: absolute;
+    top: -200px; /* Moves the cloud higher */
+    left: -150px; /* Moves it off the page */
+    width: 600px;  /* Adjust width */
+    height: auto; /* Ensure correct height */
+    transform: scaleX(-1); /* Flip horizontally */
+}
+
+/* Right Cloud - Smaller, Independent Positioning */
+.cloud-right {
+    position: absolute;
+    top: -200px; /* Moves the cloud higher */
+    right: -150px; /* Moves it off the page */
+    width: 400px;  /* Adjust width */
+    height: auto; /* Ensure correct height */
+    transform: scaleX(-1); /* Flip horizontally */
 }
 
 /* Header styling */
 h1 {
     font-size: 24px;
-    margin-top: 30px;
+    margin-top: 50px;
     font-weight: 700;
 }
 
@@ -38,7 +191,7 @@ h1 {
     margin: 5px;
 }
 
-/* Rectangle styling */
+/* Rectangle styling for activity & metric sections */
 .rectangle {
     width: 350px;
     background: #1d574c;
@@ -144,6 +297,7 @@ li {
     font-weight: bold;
 }
 
+/* Maximize button */
 .maximize-btn {
     background-color: #43d6b9;
     color: white;
@@ -158,4 +312,35 @@ li {
 
 .maximize-btn:hover {
     background-color: #e68900;
+}
+
+.footer-text {
+    position: fixed; /* Sticks it to the bottom of the screen */
+    bottom: 5px; /* Adjusts the distance from the bottom */
+    right: 5px; /* Adjusts the distance from the right */
+    font-size: 14px;
+
+}
+
+#username-input {
+    width: 150px;
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#join-date {
+    font-size: 20px;
+    font-weight: 400;
+    color: #1d574c;
+    line-height: 1.8; /* Increases spacing between lines */
+}
+
+#user-details p {
+    font-size: 20px;
+    font-weight: 400;
+    color: #1d574c;
+    line-height: 1.8; /* Increases spacing between lines */
 }
