@@ -157,34 +157,32 @@ function toggleActivitiesRectangle(button) {
     inputField.focus();
 }
 
-
-// 📝 Updated Save Activity Function (Fixes Save Button)
 function saveActivity() {
     let input = document.getElementById("activityInput");
-    if (!input) return; // Prevents errors if input isn't found
+    if (!input) return;
 
     let activity = input.value.trim();
-    if (activity === "") return; // Ignore empty input
+    if (activity === "") return;
 
     let carbonData = estimateCarbonOutput(activity);
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
 
-    // 🗓️ Store with date for streak tracking
     activities.unshift({ 
         name: activity, 
         carbon: carbonData.carbon, 
         category: carbonData.category,
-        date: new Date().toISOString() // Store ISO timestamp
+        date: new Date().toISOString() 
     });
 
     localStorage.setItem("activities", JSON.stringify(activities));
 
-    input.value = ""; // Clear input field
-    loadActivities(); // 🔄 Reload activities
-    updateTotalCarbon(); // 📊 Update total CO₂
-    updateClimateStreak(); // 🔥 Update streak
+    input.value = "";
+    loadActivities();
+    updateTotalCarbon();
+    updateClimateStreak();
+    updateEcoScore(); // 🌟 Update Eco Score dynamically
 
-    console.log("Activity saved:", activities); // Debugging log
+    console.log("Activity saved:", activities);
 }
 
 // 📌 Ensure Save Button Works Even After UI Refresh
@@ -266,21 +264,19 @@ function toggleMetricsRectangle(button) {
 
 function updateEcoScore() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    let ecoScoreElement = document.getElementById("ecoScore");
-
-    if (!ecoScoreElement) return;
-
+    
     if (activities.length === 0) {
-        ecoScoreElement.textContent = "N/A"; // No data yet
+        document.getElementById("ecoScore").textContent = "100/100"; // Default
         return;
     }
 
+    // Calculate total carbon emissions
     let totalCarbon = activities.reduce((sum, activity) => sum + parseFloat(activity.carbon || 0), 0);
-    
-    // 🌱 Simple formula for an **Eco Score** (Lower Carbon = Higher Score)
-    let score = Math.max(100 - totalCarbon * 2, 0); // Scale it to 100, adjust as needed
 
-    ecoScoreElement.textContent = `${score.toFixed(0)} / 100`; // Display Eco Score
+    // Normalize Eco Score (each 1 kg CO₂ = -1 point)
+    let ecoScore = Math.max(100 - (totalCarbon * 1), 0).toFixed(1);
+
+    document.getElementById("ecoScore").textContent = `${ecoScore}/100`;
 }
 
 // 🌟 Ensure the streak updates on page load
@@ -569,18 +565,22 @@ function loadActivities() {
     });
 }
 
-
 function updateCarbon(index, newValue) {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
 
     newValue = parseFloat(newValue);
     if (!isNaN(newValue) && newValue >= 0) {
-        activities[index].carbon = newValue; // Update stored carbon value
+        activities[index].carbon = newValue;
         localStorage.setItem("activities", JSON.stringify(activities));
-        updateTotalCarbon(); // 🔥 Update total carbon output
-        updateCarbonColor(index, newValue); // 🔥 Update color of the square
+        updateTotalCarbon();
+        updateEcoScore(); // 🌟 Update Eco Score dynamically
+        updateCarbonColor(index, newValue);
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    updateEcoScore(); 
+});
 
 function updateTotalCarbon() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
@@ -603,14 +603,16 @@ function updateCarbonColor(index, newValue) {
     carbonSquare.style.backgroundColor = color;
 }
 
-// ❌ Function to Delete Activity and Update Carbon Output
 function deleteActivity(index) {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
     activities.splice(index, 1);
     localStorage.setItem("activities", JSON.stringify(activities));
-    loadActivities(); // Reload activities list
-    updateTotalCarbon(); // 🔥 Update carbon total immediately
+    loadActivities();
+    updateTotalCarbon();
+    updateEcoScore(); // 🌟 Update Eco Score dynamically
 }
+
+
 
 // 🏆 Dragging Function
 function makeDraggable(element) {
