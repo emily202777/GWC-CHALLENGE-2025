@@ -330,6 +330,15 @@ li {
     border-radius: 10px;
 }
 
+
+/* Ensure tooltip shows up when hovering */
+.metric-container {
+    position: relative;
+    cursor: pointer;
+}
+
+
+
 /* Inner Rectangles */
 .metrics-container {
     display: flex;
@@ -443,6 +452,7 @@ li {
 }
 
 /* Style the tooltip (hidden by default) */
+/* Tooltip Styling */
 .tooltip {
     position: absolute;
     background: rgba(0, 0, 0, 0.8);
@@ -452,7 +462,7 @@ li {
     border-radius: 5px;
     width: 200px;
     text-align: center;
-    visibility: hidden; /* Hidden by default */
+    visibility: hidden; /* Initially hidden */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     bottom: 120%; /* Position above the rectangle */
@@ -460,7 +470,6 @@ li {
     transform: translateX(-50%);
     z-index: 10;
 }
-
 /* Ensure tooltip shows up when hovering */
 .eco-score-container {
     position: relative;
