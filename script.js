@@ -221,18 +221,37 @@ function toggleActivitiesRectangle(button) {
     document.getElementById("saveActivityBtn").addEventListener("click", saveActivity);
 }
 
-
 function toggleMetricsRectangle(button) {
     toggleSection("metrics-container", button, `
         <h3>Your Metrics</h3>
         <div class="metrics-container">
             <div class="small-rectangle">Total Carbon Output: <span id="totalCarbonMetric">0 kg CO₂</span></div>
             <div class="small-rectangle" id="loggingStreak">Climate action streak: 0</div>
-            <div class="small-rectangle">Diet Score: <span id="dietScore">N/A</span></div>
+            <div class="small-rectangle">Eco Score: <span id="ecoScore">N/A</span></div>
         </div>
     `);
     updateTotalCarbon();
-    updateClimateStreak(); // 🔥 Ensure streak is loaded
+    updateClimateStreak();
+    updateEcoScore(); // ✅ Ensure Eco Score updates when metrics are opened
+}
+
+function updateEcoScore() {
+    let activities = JSON.parse(localStorage.getItem("activities")) || [];
+    let ecoScoreElement = document.getElementById("ecoScore");
+
+    if (!ecoScoreElement) return;
+
+    if (activities.length === 0) {
+        ecoScoreElement.textContent = "N/A"; // No data yet
+        return;
+    }
+
+    let totalCarbon = activities.reduce((sum, activity) => sum + parseFloat(activity.carbon || 0), 0);
+    
+    // 🌱 Simple formula for an **Eco Score** (Lower Carbon = Higher Score)
+    let score = Math.max(100 - totalCarbon * 2, 0); // Scale it to 100, adjust as needed
+
+    ecoScoreElement.textContent = `${score.toFixed(0)} / 100`; // Display Eco Score
 }
 
 // 🌟 Ensure the streak updates on page load
