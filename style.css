@@ -404,23 +404,23 @@ li {
     line-height: 1.8; /* Increases spacing between lines */
 }
 
-/* Carbon Output Square (Keeps "kg CO₂" Close to the Number) */
 .carbon-square {
     display: flex;
     align-items: center;
-    gap: 2px; /* Reduce space between number and "kg CO₂" */
-    width: 95px; /* Adjusted width */
-    height: 30px;
-    background-color: #3BB143; /* Default Green */
+    justify-content: center; /* Ensure content is centered */
+    gap: 6px; /* Increase space between number and "kg CO₂" */
+    padding: 10px 12px; /* Increase padding inside the rectangle */
+    min-width: 100px; /* Prevent excessive shrinking */
+    height: 35px; /* Slightly taller for better spacing */
+    background-color: #D9534F; /* Red for high CO₂, adjust as needed */
     color: white;
     font-size: 14px;
     font-weight: bold;
     text-align: center;
-    border-radius: 5px;
-    padding: 5px 8px;
-    margin-right: 10px;
-    white-space: nowrap; /* Prevents wrapping */
+    border-radius: 8px;
+    white-space: nowrap; /* Prevents text wrapping */
 }
+
 
 .carbon-input {
     width: 40px; /* Adjust width */
