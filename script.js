@@ -1,3 +1,73 @@
+function editUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+
+    // Show input field when clicking the pencil
+    usernameInput.value = usernameSpan.textContent;
+    usernameSpan.style.display = "none";
+    usernameInput.style.display = "inline-block";
+    usernameInput.focus();
+
+    // Handle Enter key to save username
+    usernameInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            saveUsername();
+        }
+    });
+
+    // Handle clicking outside the input to save
+    usernameInput.addEventListener("blur", saveUsername);
+}
+
+function saveUsername() {
+    let usernameSpan = document.getElementById("username");
+    let usernameInput = document.getElementById("username-input");
+    let newUsername = usernameInput.value.trim();
+
+    if (newUsername) {
+        usernameSpan.textContent = newUsername;
+        localStorage.setItem("username", newUsername);
+
+        // If join date is not set, set it now (first-time username change)
+        if (!localStorage.getItem("joinDate")) {
+            let today = new Date();
+            let formattedDate = today.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+            });
+            localStorage.setItem("joinDate", formattedDate);
+            document.getElementById("join-date").textContent = `Joined: ${formattedDate}`;
+        }
+    }
+
+    // Hide input field and show username again
+    usernameInput.style.display = "none";
+    usernameSpan.style.display = "inline";
+}
+
+
+
+// Load username & join date from localStorage on page load
+document.addEventListener("DOMContentLoaded", function () {
+    let savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+        document.getElementById("username").textContent = savedUsername;
+    }
+
+    let savedJoinDate = localStorage.getItem("joinDate") || "2/12/2025";
+    document.getElementById("join-date").textContent = `Joined: ${savedJoinDate}`;
+});
+
+// Load username from localStorage on page load
+document.addEventListener("DOMContentLoaded", function () {
+    let savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+        document.getElementById("username").textContent = savedUsername;
+    }
+});
+
+
 document.addEventListener("DOMContentLoaded", function () {
     let today = new Date();
     let formattedDate = today.toLocaleDateString("en-US", { 
@@ -44,18 +114,18 @@ function toggleActivitiesRectangle(button) {
     if (!section) return;
 
     let existingBox = section.querySelector(".rectangle");
-
     if (existingBox) {
         existingBox.style.display = existingBox.style.display === "none" ? "block" : "none";
         return;
     }
 
+    // 🏗️ Create Activity Logging Box
     let box = document.createElement("div");
     box.className = "rectangle dynamic-section";
     box.innerHTML = `
         <div class="input-container">
             <input type="text" id="activityInput" placeholder="Type your activity..." class="input-box">
-            <button onclick="saveActivity()" class="save-btn">Save</button>
+            <button id="saveActivityBtn" class="save-btn">Save</button>
         </div>
         <ul id="activityList"></ul>
         <div class="resizer"></div>
@@ -66,8 +136,27 @@ function toggleActivitiesRectangle(button) {
 
     makeDraggable(box);
     makeResizable(box);
-    loadActivities(); // Ensure activities are loaded into the UI
+    loadActivities(); // 🏆 Load past activities
+
+    // 🔥 Event Listeners for Saving Activities
+    let inputField = document.getElementById("activityInput");
+    let saveButton = document.getElementById("saveActivityBtn");
+
+    // 🎯 Click Save Button to Save Activity
+    saveButton.addEventListener("click", saveActivity);
+
+    // ⏎ Pressing "Enter" Saves Activity
+    inputField.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Stops accidental form submission
+            saveActivity();
+        }
+    });
+
+    // 🚀 Auto-focus input for quick typing
+    inputField.focus();
 }
+
 
 // 📝 Updated Save Activity Function (Fixes Save Button)
 function saveActivity() {
