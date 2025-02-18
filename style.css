@@ -422,10 +422,8 @@ li {
     white-space: nowrap; /* Prevents wrapping */
 }
 
-/* Editable Carbon Output Input */
 .carbon-input {
-    width: 35px; /* Reduced width to bring text closer */
-    height: 24px;
+    width: 40px; /* Adjust width */
     font-size: 14px;
     font-weight: bold;
     text-align: center;
@@ -433,7 +431,7 @@ li {
     background: transparent;
     color: white;
     outline: none;
-    padding: 0; /* Remove unnecessary padding */
+    padding: 0;
     margin-right: 2px; /* Minimal spacing */
 }
 
