@@ -227,13 +227,31 @@ function toggleMetricsRectangle(button) {
         <div class="metrics-container">
             <div class="small-rectangle">Total Carbon Output: <span id="totalCarbonMetric">0 kg CO₂</span></div>
             <div class="small-rectangle" id="loggingStreak">Climate action streak: 0</div>
-            <div class="small-rectangle">Eco Score: <span id="ecoScore">N/A</span></div>
+            <div class="small-rectangle eco-score-container">
+                Eco Score: <span id="ecoScore">N/A</span>
+                <div class="tooltip">Eco Score is calculated based on your carbon footprint. A higher score means you're making more eco-friendly choices.</div>
+            </div>
         </div>
     `);
     updateTotalCarbon();
     updateClimateStreak();
-    updateEcoScore(); // ✅ Ensure Eco Score updates when metrics are opened
+    updateEcoScore(); // ✅ Update Eco Score on metrics open
+
+    // Add event listeners for hover effect
+    let ecoScoreBox = document.querySelector(".eco-score-container");
+    let tooltip = ecoScoreBox.querySelector(".tooltip");
+
+    ecoScoreBox.addEventListener("mouseenter", () => {
+        tooltip.style.opacity = "1";
+        tooltip.style.visibility = "visible";
+    });
+
+    ecoScoreBox.addEventListener("mouseleave", () => {
+        tooltip.style.opacity = "0";
+        tooltip.style.visibility = "hidden";
+    });
 }
+
 
 function updateEcoScore() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
