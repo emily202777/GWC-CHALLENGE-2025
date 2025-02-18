@@ -69,8 +69,70 @@ function toggleActivitiesRectangle(button) {
     loadActivities(); // Ensure activities are loaded into the UI
 }
 
+// 📝 Updated Save Activity Function (Fixes Save Button)
+function saveActivity() {
+    let input = document.getElementById("activityInput");
+    if (!input) return; // Prevents errors if input isn't found
 
-// 📊 Function to Toggle the Metrics Rectangle
+    let activity = input.value.trim();
+    if (activity === "") return; // Ignore empty input
+
+    let carbonData = estimateCarbonOutput(activity);
+    let activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+    // 🗓️ Store with date for streak tracking
+    activities.unshift({ 
+        name: activity, 
+        carbon: carbonData.carbon, 
+        category: carbonData.category,
+        date: new Date().toISOString() // Store ISO timestamp
+    });
+
+    localStorage.setItem("activities", JSON.stringify(activities));
+
+    input.value = ""; // Clear input field
+    loadActivities(); // 🔄 Reload activities
+    updateTotalCarbon(); // 📊 Update total CO₂
+    updateClimateStreak(); // 🔥 Update streak
+
+    console.log("Activity saved:", activities); // Debugging log
+}
+
+// 📌 Ensure Save Button Works Even After UI Refresh
+function toggleActivitiesRectangle(button) {
+    let section = document.getElementById("activities-container");
+    if (!section) return;
+
+    let existingBox = section.querySelector(".rectangle");
+    if (existingBox) {
+        existingBox.style.display = existingBox.style.display === "none" ? "block" : "none";
+        return;
+    }
+
+    // 🏗️ Rebuild UI for Activity Input
+    let box = document.createElement("div");
+    box.className = "rectangle dynamic-section";
+    box.innerHTML = `
+        <div class="input-container">
+            <input type="text" id="activityInput" placeholder="Type your activity..." class="input-box">
+            <button id="saveActivityBtn" class="save-btn">Save</button>
+        </div>
+        <ul id="activityList"></ul>
+        <div class="resizer"></div>
+    `;
+
+    section.appendChild(box);
+    section.style.display = "block";
+
+    makeDraggable(box);
+    makeResizable(box);
+    loadActivities(); // 🏆 Load past activities
+
+    // 🔥 Reattach Event Listener to Save Button
+    document.getElementById("saveActivityBtn").addEventListener("click", saveActivity);
+}
+
+
 function toggleMetricsRectangle(button) {
     toggleSection("metrics-container", button, `
         <h3>Your Metrics</h3>
@@ -80,8 +142,56 @@ function toggleMetricsRectangle(button) {
             <div class="small-rectangle">Diet Score: <span id="dietScore">N/A</span></div>
         </div>
     `);
-    updateTotalCarbon(); // Update total carbon when the metrics box is opened
+    updateTotalCarbon();
+    updateClimateStreak(); // 🔥 Ensure streak is loaded
 }
+
+// 🌟 Ensure the streak updates on page load
+document.addEventListener("DOMContentLoaded", function () {
+    updateClimateStreak(); 
+});
+
+function updateClimateStreak() {
+    let activities = JSON.parse(localStorage.getItem("activities")) || [];
+    let streakElement = document.getElementById("loggingStreak");
+    
+    if (!streakElement) return; // Prevent errors
+
+    if (activities.length === 0) {
+        streakElement.textContent = "Climate action streak: 0";
+        localStorage.setItem("climateStreak", "0");
+        return;
+    }
+
+    // 🗓️ Extract unique days when activities were logged
+    let activityDates = activities.map(activity => {
+        let date = new Date(activity.date);
+        return date.toDateString(); // Normalize to avoid time mismatches
+    });
+
+    let uniqueDays = [...new Set(activityDates)]; // Remove duplicate days
+    uniqueDays.sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+
+    // 🔄 Calculate Streak
+    let streak = 1; // Start with 1 day
+    for (let i = 0; i < uniqueDays.length - 1; i++) {
+        let currentDate = new Date(uniqueDays[i]);
+        let previousDate = new Date(uniqueDays[i + 1]);
+
+        let diffInDays = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+        
+        if (diffInDays === 1) {
+            streak++; // Count consecutive day
+        } else {
+            break; // Streak broken
+        }
+    }
+
+    // 🔥 Save and Update UI
+    streakElement.textContent = `Climate action streak: ${streak}`;
+    localStorage.setItem("climateStreak", streak.toString());
+}
+
 
 // 🔮 Function to Toggle "Magic Recommendations"
 function toggleRecommendations(button) {
@@ -255,22 +365,45 @@ function gptEstimateCarbon(activity) {
 }
 
 
-// 📝 Function to Save Activities and Update Carbon Output
-function saveActivity() {
-    let input = document.getElementById("activityInput");
-    let activity = input.value.trim();
-
-    if (activity === "") return; // Ignore empty input
-
-    let carbonData = estimateCarbonOutput(activity);
+function updateClimateStreak() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
+    let streakElement = document.getElementById("loggingStreak");
+    
+    if (!streakElement) return; // Prevent errors
 
-    activities.unshift({ name: activity, carbon: carbonData.carbon, category: carbonData.category });
-    localStorage.setItem("activities", JSON.stringify(activities));
+    if (activities.length === 0) {
+        streakElement.textContent = "Climate action streak: 0";
+        localStorage.setItem("climateStreak", "0");
+        return;
+    }
 
-    input.value = ""; // Clear input field
-    loadActivities(); // Reload activities list
-    updateTotalCarbon(); // 🔥 Update carbon total immediately
+    // 🗓️ Extract unique days when activities were logged
+    let activityDates = activities.map(activity => {
+        let date = new Date(activity.date);
+        return date.toDateString(); // Normalize to avoid time mismatches
+    });
+
+    let uniqueDays = [...new Set(activityDates)]; // Remove duplicate days
+    uniqueDays.sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+
+    // 🔄 Calculate Streak
+    let streak = 1; // Start with 1 day
+    for (let i = 0; i < uniqueDays.length - 1; i++) {
+        let currentDate = new Date(uniqueDays[i]);
+        let previousDate = new Date(uniqueDays[i + 1]);
+
+        let diffInDays = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+        
+        if (diffInDays === 1) {
+            streak++; // Count consecutive day
+        } else {
+            break; // Streak broken
+        }
+    }
+
+    // 🔥 Save and Update UI
+    streakElement.textContent = `Climate action streak: ${streak}`;
+    localStorage.setItem("climateStreak", streak.toString());
 }
 
 // 🔄 Function to Load Activities and Assign Proper Carbon Colors
