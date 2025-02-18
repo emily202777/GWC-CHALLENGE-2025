@@ -118,7 +118,7 @@ body {
 }
 
 .btn {
-    background-color: #43d6b9;
+    background-color: #c9e5c0;
     color: #1d574c;
     padding: 15px 40px; /* Make buttons larger */
     border: none;
@@ -131,7 +131,7 @@ body {
 }
 
 .btn:hover {
-    background-color: #38c2a5; /* Slightly darker hover effect */
+    background-color: #a5c09c; /* Slightly darker hover effect */
 }
 
 
@@ -181,7 +181,7 @@ h1 {
 }
 
 .btn {
-    background-color: #43d6b9;
+    background-color: #c9e5c0;
     color: #1d574c;
     padding: 10px 20px;
     border: none;
@@ -191,16 +191,70 @@ h1 {
     margin: 5px;
 }
 
-/* Rectangle styling for activity & metric sections */
 .rectangle {
-    width: 350px;
+    position: absolute;
     background: #1d574c;
     color: white;
     padding: 15px;
     border-radius: 10px;
-    margin: 20px auto;
+    min-width: 200px;
+    min-height: 100px;
+    width: 350px;
+    height: 200px;
     text-align: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    cursor: grab;
 }
+
+.rectangle:active {
+    cursor: grabbing;
+}
+
+.resizer {
+    width: 15px;
+    height: 15px;
+    background: #43d6b9;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    cursor: se-resize;
+    border-radius: 50%;
+}
+
+/* Activity list */
+ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+li {
+    background: white;
+    color: #1d574c;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    width: 90%;
+    margin: 5px auto;
+}
+
+/* Delete button */
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
 
 /* Input box and save button container */
 .input-container {
@@ -219,7 +273,7 @@ h1 {
 }
 
 .save-btn {
-    background-color: #43d6b9;
+    background-color: #c9e5c0;
     color: white;
     padding: 8px 12px;
     border: none;
@@ -299,7 +353,7 @@ li {
 
 /* Maximize button */
 .maximize-btn {
-    background-color: #43d6b9;
+    background-color: #c9e5c0;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -343,4 +397,18 @@ li {
     font-weight: 400;
     color: #1d574c;
     line-height: 1.8; /* Increases spacing between lines */
+}
+
+/* Carbon Output Square */
+.carbon-square {
+    display: inline-block;
+    width: 80px;
+    height: 30px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    margin-right: 10px;
 }
