@@ -273,23 +273,25 @@ function saveActivity() {
     updateTotalCarbon(); // 🔥 Update carbon total immediately
 }
 
-// 🔹 Function to Load Activities with Carbon Display
-// 🔹 Function to Load Activities & Allow Editing of Carbon Output
+// 🔄 Function to Load Activities and Assign Proper Carbon Colors
 function loadActivities() {
     let activityList = document.getElementById("activityList");
     if (!activityList) return;
 
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    activityList.innerHTML = "";
+    activityList.innerHTML = ""; // Clear previous activities
 
     activities.forEach((activity, index) => {
         let listItem = document.createElement("li");
 
-        let color = activity.category === "high" ? "#D9534F" : "#3BB143";
+        let carbonValue = parseFloat(activity.carbon);
+        let color = carbonValue > 0 ? "#D9534F" : "#3BB143"; // Red for emitting, green for neutral
+
         let carbonSquare = `
-            <span class="carbon-square" style="background-color: ${color};">
-                <input type="number" value="${activity.carbon.toFixed(1)}" 
-                    class="carbon-input" onchange="updateCarbon(${index}, this.value)"> 
+            <span class="carbon-square" id="carbon-square-${index}" style="background-color: ${color};">
+                <input type="number" value="${carbonValue.toFixed(1)}" 
+                    class="carbon-input" id="carbon-input-${index}" 
+                    onchange="updateCarbon(${index}, this.value)"> 
                 kg CO₂
             </span>`;
 
@@ -300,6 +302,7 @@ function loadActivities() {
     });
 }
 
+
 // ✏️ Allow Users to Manually Adjust Carbon Output
 function updateCarbon(index, newValue) {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
@@ -308,12 +311,13 @@ function updateCarbon(index, newValue) {
     if (!isNaN(newValue)) {
         activities[index].carbon = newValue;
         localStorage.setItem("activities", JSON.stringify(activities));
-        updateTotalCarbon(); // 🔥 Update total carbon immediately
+        updateTotalCarbon(); // 🔥 Update total carbon output
+        updateCarbonColor(index, newValue); // 🔥 Update color of the square
     }
 }
 
 
-// 🔄 Function to Update Total Carbon Output in Metrics
+
 // 🔄 Function to Update Total Carbon Output in Metrics
 function updateTotalCarbon() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
