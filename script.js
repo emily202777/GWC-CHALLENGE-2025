@@ -495,7 +495,6 @@ function updateClimateStreak() {
     localStorage.setItem("climateStreak", streak.toString());
 }
 
-// 🔄 Function to Load Activities and Assign Proper Carbon Colors
 function loadActivities() {
     let activityList = document.getElementById("activityList");
     if (!activityList) return;
@@ -510,10 +509,10 @@ function loadActivities() {
         let color = carbonValue > 0 ? "#D9534F" : "#3BB143"; // Red for emitting, green for neutral
 
         let carbonSquare = `
-            <span class="carbon-square" id="carbon-square-${index}" style="background-color: ${color};">
+            <span class="carbon-square" style="background-color: ${color};">
                 <input type="number" value="${carbonValue.toFixed(1)}" 
                     class="carbon-input" id="carbon-input-${index}" 
-                    onchange="updateCarbon(${index}, this.value)"> 
+                    onchange="updateCarbon(${index}, this.value)">
                 kg CO₂
             </span>`;
 
@@ -525,22 +524,18 @@ function loadActivities() {
 }
 
 
-// ✏️ Allow Users to Manually Adjust Carbon Output
 function updateCarbon(index, newValue) {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
 
     newValue = parseFloat(newValue);
-    if (!isNaN(newValue)) {
-        activities[index].carbon = newValue;
+    if (!isNaN(newValue) && newValue >= 0) {
+        activities[index].carbon = newValue; // Update stored carbon value
         localStorage.setItem("activities", JSON.stringify(activities));
         updateTotalCarbon(); // 🔥 Update total carbon output
         updateCarbonColor(index, newValue); // 🔥 Update color of the square
     }
 }
 
-
-
-// 🔄 Function to Update Total Carbon Output in Metrics
 function updateTotalCarbon() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
     
@@ -554,6 +549,12 @@ function updateTotalCarbon() {
     if (carbonMetric) {
         carbonMetric.textContent = `${totalCarbon.toFixed(1)} kg CO₂`;
     }
+}
+
+function updateCarbonColor(index, newValue) {
+    let carbonSquare = document.getElementById(`carbon-input-${index}`).parentNode;
+    let color = newValue > 0 ? "#D9534F" : "#3BB143"; // Red for high emissions, green for low/neutral
+    carbonSquare.style.backgroundColor = color;
 }
 
 // ❌ Function to Delete Activity and Update Carbon Output
