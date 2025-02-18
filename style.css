@@ -213,7 +213,7 @@ h1 {
 .resizer {
     width: 15px;
     height: 15px;
-    background: #43d6b9;
+    background: #c9e5c0;
     position: absolute;
     bottom: 5px;
     right: 5px;
@@ -338,18 +338,23 @@ li {
 }
 
 .small-rectangle {
-    width: 100px;
-    height: 80px;
+    width: 120px; /* Adjust width as needed */
+    height: 90px; /* Adjust height as needed */
     background: white;
     color: #1d574c;
     display: flex;
+    flex-direction: column; /* Ensure text stacks nicely */
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 16px; /* Adjust text size */
     border-radius: 10px;
     margin: 5px;
     font-weight: bold;
+    padding: 12px; /* Increase padding for more spacing */
+    text-align: center;
+    line-height: 1.5; /* Improve text readability */
 }
+
 
 /* Maximize button */
 .maximize-btn {
@@ -438,4 +443,3 @@ li {
     -webkit-appearance: none;
     margin: 0;
 }
-
