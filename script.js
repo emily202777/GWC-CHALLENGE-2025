@@ -311,66 +311,64 @@ function toggleRecommendations(button) {
     generateRecommendations(); // 🔥 Generate recommendations based on activity log
 }
 
-// 🔮 AI-Powered Function to Generate Smart Recommendations
 function generateRecommendations() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
     let recommendationsList = document.getElementById("recommendations-list");
 
     if (!recommendationsList) return;
-
     recommendationsList.innerHTML = ""; // Clear old recommendations
 
-    // 🚨 If fewer than 3 activities, prompt user to log more
-    if (activities.length < 3) {
+    // 🚨 If no activities logged, prompt user to log some
+    if (activities.length === 0) {
         let listItem = document.createElement("li");
-        listItem.textContent = "Log more activities before generating recommendations!";
+        listItem.textContent = "Log some activities to get personalized recommendations!";
         recommendationsList.appendChild(listItem);
-        return; // Stop function if not enough data
+        return;
     }
 
-    // 🌱 Eco-Friendly Tips Based on High-Carbon Activities
+    // 🌱 Define High-Carbon Activity Recommendations
     const recommendationMap = {
-        "driving": "Consider biking, walking, or using public transport to reduce emissions.",
-        "plane": "Flying produces high CO₂—try train or carpooling for shorter trips!",
-        "meat": "Try swapping meat for plant-based alternatives to lower your carbon footprint.",
-        "laundry": "Wash clothes in cold water and air dry to save energy!",
-        "plastic": "Reduce plastic use by carrying a reusable water bottle and bags.",
-        "electricity": "Use LED bulbs and turn off appliances when not in use to save energy."
+        "driving": ["Try carpooling with a colleague or a friend!", "Use public transport for shorter trips.", "Consider biking or walking instead of driving."],
+        "plane": ["Book flights with lower CO₂ emissions.", "Consider train travel for shorter distances.", "Try video conferencing instead of flying for business."],
+        "meat consumption": ["Try a plant-based meal once a week!", "Reduce red meat intake to lower your carbon footprint.", "Buy locally sourced food to cut transportation emissions."],
+        "laundry": ["Wash clothes in cold water to save energy.", "Air dry your clothes instead of using a dryer."],
+        "plastic": ["Carry a reusable water bottle to reduce plastic waste.", "Avoid single-use plastics like bags and straws."],
+        "electricity use": ["Unplug devices when not in use.", "Use LED bulbs to save energy.", "Switch to renewable energy sources if available."]
     };
 
-    // 🔍 Find the Activity with the Highest Carbon Output
-    let highestCarbonActivity = null;
-    let highestCarbonValue = 0;
+    // 🔍 Find the **Highest Carbon Activities**
+    let maxCarbon = Math.max(...activities.map(a => parseFloat(a.carbon) || 0)); // Find the highest carbon value
 
-    activities.forEach(activity => {
-        let carbonValue = parseFloat(activity.carbon);
-        if (carbonValue > highestCarbonValue) {
-            highestCarbonValue = carbonValue;
-            highestCarbonActivity = activity.name.toLowerCase(); // Store lowercase activity name
-        }
-    });
-
-    // 🚦 If all logged activities have `0 kg CO₂` or lower, display eco-friendly message
-    if (highestCarbonValue === 0) {
+    if (maxCarbon === 0) {
         let listItem = document.createElement("li");
         listItem.textContent = "You're already making great eco-friendly choices!";
         recommendationsList.appendChild(listItem);
         return;
     }
 
-    // 📝 Provide a Recommendation Based on the Highest Carbon Activity
-    let recommendation = "Consider making small changes to reduce your carbon footprint!";
-    
-    for (const key in recommendationMap) {
-        if (highestCarbonActivity.includes(key)) {
-            recommendation = recommendationMap[key];
-            break;
+    let highCarbonActivities = activities
+        .filter(activity => parseFloat(activity.carbon) === maxCarbon) // Find all activities that match the highest CO₂ output
+        .map(activity => activity.name.toLowerCase());
+
+    // 📝 Provide a Recommendation Based on High Carbon Activities
+    let recommendations = new Set(); // Use a Set to avoid duplicate suggestions
+
+    for (let category in recommendationMap) {
+        if (highCarbonActivities.some(activity => activity.includes(category))) {
+            recommendationMap[category].forEach(rec => recommendations.add(rec)); // Add all suggestions
         }
     }
 
-    let listItem = document.createElement("li");
-    listItem.textContent = recommendation;
-    recommendationsList.appendChild(listItem);
+    // 🔥 Display Recommendations
+    if (recommendations.size === 0) {
+        recommendationsList.innerHTML = "<li>No specific recommendations found. Keep making eco-friendly choices!</li>";
+    } else {
+        recommendations.forEach(rec => {
+            let listItem = document.createElement("li");
+            listItem.textContent = rec;
+            recommendationsList.appendChild(listItem);
+        });
+    }
 }
 
 
