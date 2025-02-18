@@ -446,37 +446,60 @@ function toggleWorld(button) {
 }
 
 
-// 🌱 AI Function to Estimate Carbon Output
-// 🌱 AI-Enhanced Carbon Output Estimator
 function estimateCarbonOutput(activity) {
-    activity = activity.toLowerCase();
+    activity = activity.toLowerCase().trim();
 
-    // 🔹 Improved dataset with real-world carbon output estimates (kg CO₂ per activity)
     const carbonDatabase = [
-        { keywords: ["driving", "car ride"], carbon: 2.5 },
-        { keywords: ["bus ride", "public transport"], carbon: 0.5 },
-        { keywords: ["plane", "flying", "airplane"], carbon: 90.0 },
-        { keywords: ["train", "subway"], carbon: 0.2 },
-        { keywords: ["walking", "bike", "cycling"], carbon: 0.0 },
-        { keywords: ["meat", "beef", "burger"], carbon: 27.0 },
-        { keywords: ["chicken", "pork"], carbon: 6.0 },
-        { keywords: ["vegan", "plant-based"], carbon: -2.0 },
-        { keywords: ["plastic use", "plastic bottle"], carbon: 2.0 },
-        { keywords: ["recycling", "composting"], carbon: 0.0 },
-        { keywords: ["laundry", "washing clothes"], carbon: 1.5 },
-        { keywords: ["electricity", "power usage"], carbon: 1.0 },
-        { keywords: ["solar energy", "renewable"], carbon: -5.0 },
-        { keywords: ["turn off lights", "save energy"], carbon: 0.0 }
+        // 🚗 Transportation
+        { keywords: ["drive", "driving", "drove", "car ride", "commute by car", "road trip"], carbon: 2.5 },
+        { keywords: ["bus ride", "took the bus", "public transport"], carbon: 0.5 },
+        { keywords: ["train", "subway", "metro", "commute by train"], carbon: 0.2 },
+        { keywords: ["plane", "flying", "airplane", "flight"], carbon: 90.0 },
+        { keywords: ["bike", "cycling", "biking", "rode a bike"], carbon: 0.0 },
+        { keywords: ["walking", "walked", "hiking"], carbon: 0.0 },
+
+        // 🍔 Food Consumption
+        { keywords: ["ate beef", "ate steak", "burger", "red meat", "beef"], carbon: 27.0 },
+        { keywords: ["ate chicken", "pork", "bacon", "chicken sandwich"], carbon: 6.0 },
+        { keywords: ["vegan", "vegetarian", "plant-based meal"], carbon: -2.0 },
+        { keywords: ["seafood", "fish", "salmon"], carbon: 3.0 },
+
+        // 🏡 Household Activities
+        { keywords: ["laundry", "washed clothes", "used washing machine"], carbon: 1.5 },
+        { keywords: ["dishwasher", "ran dishwasher", "washed dishes"], carbon: 1.0 },
+        { keywords: ["shower", "long shower", "took a shower"], carbon: 2.0 },
+        { keywords: ["bath", "took a bath"], carbon: 3.0 },
+        { keywords: ["electricity use", "left lights on", "forgot to turn off lights"], carbon: 1.5 },
+        { keywords: ["turned off lights", "saved electricity", "energy saving"], carbon: -2.0 },
+        { keywords: ["solar energy", "renewable energy"], carbon: -5.0 },
+
+        // 📦 Shopping & Waste
+        { keywords: ["bought clothes", "shopping", "fast fashion"], carbon: 10.0 },
+        { keywords: ["thrifted", "bought secondhand", "sustainable shopping"], carbon: -3.0 },
+        { keywords: ["recycled", "composted", "recycling", "compost"], carbon: 0.0 },
+        { keywords: ["used plastic", "bought plastic", "single-use plastic"], carbon: 2.0 },
+        { keywords: ["used reusable bag", "avoided plastic"], carbon: -1.0 },
+
+        // 💻 Technology & Entertainment
+        { keywords: ["watched tv", "streaming", "netflix", "youtube", "online videos"], carbon: 1.0 },
+        { keywords: ["listened to music", "spotify", "apple music"], carbon: 0.5 },
+        { keywords: ["used phone", "phone screen time"], carbon: 0.3 },
+        { keywords: ["gaming", "played video games"], carbon: 2.0 },
+
+        // 🔥 Miscellaneous
+        { keywords: ["campfire", "bonfire", "fireplace"], carbon: 5.0 },
+        { keywords: ["used air conditioning", "ac on", "air conditioner"], carbon: 3.0 },
+        { keywords: ["heater on", "used heater"], carbon: 2.5 }
     ];
 
-    // 🔍 Try to match the activity with the database
+    // 🔍 Try to match the activity with the database using keyword search
     for (let entry of carbonDatabase) {
         if (entry.keywords.some(keyword => activity.includes(keyword))) {
             return { carbon: entry.carbon, category: entry.carbon > 0 ? "high" : "low" };
         }
     }
 
-    // 🧠 If no match is found, estimate based on GPT-style logic (fallback)
+    // 🌍 AI-Style Fallback Estimation
     return gptEstimateCarbon(activity);
 }
 
@@ -491,10 +514,8 @@ function gptEstimateCarbon(activity) {
         }
     }
 
-    // 🌿 Default "unknown" category (neutral)
-    return { carbon: 1.0, category: "unknown" };
+    return { carbon: 1.0, category: "unknown" }; // Default unknown category
 }
-
 
 function updateClimateStreak() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
