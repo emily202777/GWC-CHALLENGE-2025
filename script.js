@@ -112,7 +112,7 @@ function toggleRecommendations(button) {
     generateRecommendations(); // 🔥 Generate recommendations based on activity log
 }
 
-// 🔮 AI-Powered Function to Generate Recommendations
+// 🔮 AI-Powered Function to Generate Smart Recommendations
 function generateRecommendations() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
     let recommendationsList = document.getElementById("recommendations-list");
@@ -121,36 +121,59 @@ function generateRecommendations() {
 
     recommendationsList.innerHTML = ""; // Clear old recommendations
 
-    let ecoFriendlyTips = [
-        "Try using public transportation instead of driving.",
-        "Switch to reusable water bottles and avoid plastic waste.",
-        "Consider a plant-based meal to reduce your carbon footprint.",
-        "Turn off lights when leaving a room to save energy.",
-        "Unplug electronics when not in use to save electricity.",
-        "Compost food waste to reduce landfill contributions.",
-        "Support local and sustainable food sources.",
-        "Switch to renewable energy sources like solar power."
-    ];
+    // 🚨 If fewer than 3 activities, prompt user to log more
+    if (activities.length < 3) {
+        let listItem = document.createElement("li");
+        listItem.textContent = "Log more activities before generating recommendations!";
+        recommendationsList.appendChild(listItem);
+        return; // Stop function if not enough data
+    }
 
-    let highEmissionActivityFound = false;
+    // 🌱 Eco-Friendly Tips Based on High-Carbon Activities
+    const recommendationMap = {
+        "driving": "Consider biking, walking, or using public transport to reduce emissions.",
+        "plane": "Flying produces high CO₂—try train or carpooling for shorter trips!",
+        "meat": "Try swapping meat for plant-based alternatives to lower your carbon footprint.",
+        "laundry": "Wash clothes in cold water and air dry to save energy!",
+        "plastic": "Reduce plastic use by carrying a reusable water bottle and bags.",
+        "electricity": "Use LED bulbs and turn off appliances when not in use to save energy."
+    };
+
+    // 🔍 Find the Activity with the Highest Carbon Output
+    let highestCarbonActivity = null;
+    let highestCarbonValue = 0;
 
     activities.forEach(activity => {
-        if (activity.category === "high") {
-            highEmissionActivityFound = true;
+        let carbonValue = parseFloat(activity.carbon);
+        if (carbonValue > highestCarbonValue) {
+            highestCarbonValue = carbonValue;
+            highestCarbonActivity = activity.name.toLowerCase(); // Store lowercase activity name
         }
     });
 
-    if (highEmissionActivityFound) {
-        let suggestion = ecoFriendlyTips[Math.floor(Math.random() * ecoFriendlyTips.length)];
-        let listItem = document.createElement("li");
-        listItem.textContent = suggestion;
-        recommendationsList.appendChild(listItem);
-    } else {
+    // 🚦 If all logged activities have `0 kg CO₂` or lower, display eco-friendly message
+    if (highestCarbonValue === 0) {
         let listItem = document.createElement("li");
         listItem.textContent = "You're already making great eco-friendly choices!";
         recommendationsList.appendChild(listItem);
+        return;
     }
+
+    // 📝 Provide a Recommendation Based on the Highest Carbon Activity
+    let recommendation = "Consider making small changes to reduce your carbon footprint!";
+    
+    for (const key in recommendationMap) {
+        if (highestCarbonActivity.includes(key)) {
+            recommendation = recommendationMap[key];
+            break;
+        }
+    }
+
+    let listItem = document.createElement("li");
+    listItem.textContent = recommendation;
+    recommendationsList.appendChild(listItem);
 }
+
 
 
 // 🌍 Function to Toggle "Your World"
@@ -183,48 +206,54 @@ function toggleWorld(button) {
 
 
 // 🌱 AI Function to Estimate Carbon Output
+// 🌱 AI-Enhanced Carbon Output Estimator
 function estimateCarbonOutput(activity) {
     activity = activity.toLowerCase();
 
-    const highEmissionActivities = {
-        "driving": 2.5, 
-        "car ride": 2.5,
-        "plane": 90.0,
-        "flying": 90.0,
-        "meat": 5.0,
-        "beef": 27.0,
-        "pork": 12.0,
-        "chicken": 6.0,
-        "plastic": 2.0,
-        "electricity": 1.5,
-        "laundry": 1.0
-    };
+    // 🔹 Improved dataset with real-world carbon output estimates (kg CO₂ per activity)
+    const carbonDatabase = [
+        { keywords: ["driving", "car ride"], carbon: 2.5 },
+        { keywords: ["bus ride", "public transport"], carbon: 0.5 },
+        { keywords: ["plane", "flying", "airplane"], carbon: 90.0 },
+        { keywords: ["train", "subway"], carbon: 0.2 },
+        { keywords: ["walking", "bike", "cycling"], carbon: 0.0 },
+        { keywords: ["meat", "beef", "burger"], carbon: 27.0 },
+        { keywords: ["chicken", "pork"], carbon: 6.0 },
+        { keywords: ["vegan", "plant-based"], carbon: -2.0 },
+        { keywords: ["plastic use", "plastic bottle"], carbon: 2.0 },
+        { keywords: ["recycling", "composting"], carbon: 0.0 },
+        { keywords: ["laundry", "washing clothes"], carbon: 1.5 },
+        { keywords: ["electricity", "power usage"], carbon: 1.0 },
+        { keywords: ["solar energy", "renewable"], carbon: -5.0 },
+        { keywords: ["turn off lights", "save energy"], carbon: 0.0 }
+    ];
 
-    const lowEmissionActivities = {
-        "recycling": 0.0,
-        "composting": 0.0,
-        "bike": 0.0,
-        "walking": 0.0,
-        "turn off lights": 0.0,
-        "solar energy": 0.0,
-        "planting": -5.0,
-        "vegan": -2.0
-    };
-
-    for (const key in highEmissionActivities) {
-        if (activity.includes(key)) {
-            return { carbon: highEmissionActivities[key], category: "high" };
+    // 🔍 Try to match the activity with the database
+    for (let entry of carbonDatabase) {
+        if (entry.keywords.some(keyword => activity.includes(keyword))) {
+            return { carbon: entry.carbon, category: entry.carbon > 0 ? "high" : "low" };
         }
     }
 
-    for (const key in lowEmissionActivities) {
-        if (activity.includes(key)) {
-            return { carbon: lowEmissionActivities[key], category: "low" };
-        }
-    }
-
-    return { carbon: 1.0, category: "unknown" }; // Default to 1 kg CO₂ if no match
+    // 🧠 If no match is found, estimate based on GPT-style logic (fallback)
+    return gptEstimateCarbon(activity);
 }
+
+// 🌍 Fallback AI-Based Estimation Using GPT-style Logic
+function gptEstimateCarbon(activity) {
+    if (activity.includes("miles") || activity.includes("km")) {
+        let distance = parseFloat(activity.match(/\d+/)); // Extract number from text
+        if (!isNaN(distance)) {
+            if (activity.includes("car")) return { carbon: distance * 0.25, category: "high" };
+            if (activity.includes("bike")) return { carbon: 0, category: "low" };
+            if (activity.includes("plane")) return { carbon: distance * 0.5, category: "high" };
+        }
+    }
+
+    // 🌿 Default "unknown" category (neutral)
+    return { carbon: 1.0, category: "unknown" };
+}
+
 
 // 📝 Function to Save Activities and Update Carbon Output
 function saveActivity() {
@@ -245,6 +274,7 @@ function saveActivity() {
 }
 
 // 🔹 Function to Load Activities with Carbon Display
+// 🔹 Function to Load Activities & Allow Editing of Carbon Output
 function loadActivities() {
     let activityList = document.getElementById("activityList");
     if (!activityList) return;
@@ -256,7 +286,12 @@ function loadActivities() {
         let listItem = document.createElement("li");
 
         let color = activity.category === "high" ? "#D9534F" : "#3BB143";
-        let carbonSquare = `<span class="carbon-square" style="background-color: ${color};">${activity.carbon.toFixed(1)} kg CO₂</span>`;
+        let carbonSquare = `
+            <span class="carbon-square" style="background-color: ${color};">
+                <input type="number" value="${activity.carbon.toFixed(1)}" 
+                    class="carbon-input" onchange="updateCarbon(${index}, this.value)"> 
+                kg CO₂
+            </span>`;
 
         listItem.innerHTML = `${carbonSquare} ${activity.name} 
             <button class="delete-btn" onclick="deleteActivity(${index})">❌</button>`;
@@ -264,6 +299,19 @@ function loadActivities() {
         activityList.appendChild(listItem);
     });
 }
+
+// ✏️ Allow Users to Manually Adjust Carbon Output
+function updateCarbon(index, newValue) {
+    let activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+    newValue = parseFloat(newValue);
+    if (!isNaN(newValue)) {
+        activities[index].carbon = newValue;
+        localStorage.setItem("activities", JSON.stringify(activities));
+        updateTotalCarbon(); // 🔥 Update total carbon immediately
+    }
+}
+
 
 // 🔄 Function to Update Total Carbon Output in Metrics
 // 🔄 Function to Update Total Carbon Output in Metrics
