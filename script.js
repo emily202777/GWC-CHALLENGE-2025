@@ -225,33 +225,44 @@ function toggleMetricsRectangle(button) {
     toggleSection("metrics-container", button, `
         <h3>Your Metrics</h3>
         <div class="metrics-container">
-            <div class="small-rectangle">Total Carbon Output: <span id="totalCarbonMetric">0 kg CO₂</span></div>
-            <div class="small-rectangle" id="loggingStreak">Climate action streak: 0</div>
-            <div class="small-rectangle eco-score-container">
+            <div class="small-rectangle metric-container">
+                Total Carbon Output: <span id="totalCarbonMetric">0 kg CO₂</span>
+                <div class="tooltip">This is the total amount of CO₂ emissions from your logged activities.</div>
+            </div>
+            <div class="small-rectangle metric-container">
+                Climate action streak: <span id="climateStreakValue">0</span>
+                <div class="tooltip">Your streak increases when you log eco-friendly activities daily.</div>
+            </div>
+            <div class="small-rectangle metric-container">
                 Eco Score: <span id="ecoScore">N/A</span>
-                <div class="tooltip">Eco Score is calculated based on your carbon footprint. A higher score means you're making more eco-friendly choices.</div>
+                <div class="tooltip">Eco Score is based on your carbon footprint. A higher score means more eco-friendly choices.</div>
             </div>
         </div>
     `);
+
     updateTotalCarbon();
     updateClimateStreak();
-    updateEcoScore(); // ✅ Update Eco Score on metrics open
+    updateEcoScore();
 
-    // Add event listeners for hover effect
-    let ecoScoreBox = document.querySelector(".eco-score-container");
-    let tooltip = ecoScoreBox.querySelector(".tooltip");
+    // Add hover effect for all metric containers
+    setTimeout(() => { // Delay ensures elements are fully created
+        document.querySelectorAll(".metric-container").forEach(container => {
+            let tooltip = container.querySelector(".tooltip");
 
-    ecoScoreBox.addEventListener("mouseenter", () => {
-        tooltip.style.opacity = "1";
-        tooltip.style.visibility = "visible";
-    });
+            if (tooltip) {
+                container.addEventListener("mouseenter", () => {
+                    tooltip.style.opacity = "1";
+                    tooltip.style.visibility = "visible";
+                });
 
-    ecoScoreBox.addEventListener("mouseleave", () => {
-        tooltip.style.opacity = "0";
-        tooltip.style.visibility = "hidden";
-    });
+                container.addEventListener("mouseleave", () => {
+                    tooltip.style.opacity = "0";
+                    tooltip.style.visibility = "hidden";
+                });
+            }
+        });
+    }, 100); // Small timeout to allow the DOM to update
 }
-
 
 function updateEcoScore() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
