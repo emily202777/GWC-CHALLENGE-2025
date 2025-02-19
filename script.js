@@ -319,7 +319,6 @@ function updateClimateStreak() {
     localStorage.setItem("climateStreak", streak.toString());
 }
 
-
 function toggleRecommendations(button) {
     let section = document.getElementById("recommendations-container");
     if (!section) return;
@@ -346,17 +345,20 @@ function toggleRecommendations(button) {
     makeDraggable(box);
     makeResizable(box);
 
-    // Delay execution to ensure the list exists before updating
-    setTimeout(generateRecommendations, 100);
+    // 🔥 Ensure the DOM has updated before running the function
+    setTimeout(() => {
+        generateRecommendations();
+    }, 100);
 }
 
 
 function generateRecommendations() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    let recommendationsList = document.getElementById("recommendations-list");
 
+    let recommendationsList = document.getElementById("recommendations-list");
     if (!recommendationsList) return;
-    recommendationsList.innerHTML = ""; // Clear old recommendations
+
+    recommendationsList.innerHTML = ""; // Clear previous recommendations
 
     if (activities.length === 0) {
         recommendationsList.innerHTML = "<li>Log some activities to get personalized recommendations!</li>";
@@ -376,7 +378,7 @@ function generateRecommendations() {
 
     const recommendationMap = {
         "driving": ["Try carpooling!", "Use public transport.", "Consider biking instead."],
-        "plane": ["Book eco-friendly flights.", "Try train travel for short trips.", "Video conferencing instead of flying."],
+        "plane": ["Book eco-friendly flights.", "Try train travel for short trips.", "Use video conferencing instead of flying."],
         "burger": ["Try a plant-based meal!", "Reduce red meat intake.", "Buy locally sourced food."],
         "laundry": ["Wash clothes in cold water.", "Air dry instead of using a dryer."],
         "plastic": ["Carry a reusable bottle.", "Avoid single-use plastics."],
@@ -400,6 +402,7 @@ function generateRecommendations() {
         });
     }
 }
+
 
 
 // 🌍 Function to Toggle "Your World"
