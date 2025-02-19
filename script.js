@@ -403,37 +403,6 @@ function generateRecommendations() {
     }
 }
 
-
-
-// 🌍 Function to Toggle "Your World"
-function toggleWorld(button) {
-    let section = document.getElementById("world-container");
-    if (!section) return;
-
-    let existingBox = section.querySelector(".rectangle");
-
-    if (existingBox) {
-        existingBox.style.display = existingBox.style.display === "none" ? "block" : "none";
-        return;
-    }
-
-    let box = document.createElement("div");
-    box.className = "rectangle dynamic-section";
-    box.innerHTML = `
-        <h3>Your World</h3>
-        <p>Visualize your environmental impact.</p>
-        <button class="maximize-btn" onclick="window.location.href='3d-world.html'">Maximize</button>
-        <div class="resizer"></div>
-    `;
-
-    section.appendChild(box);
-    section.style.display = "block";
-
-    makeDraggable(box);
-    makeResizable(box);
-}
-
-
 function estimateCarbonOutput(activity) {
     activity = activity.toLowerCase().trim();
 
