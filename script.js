@@ -279,54 +279,47 @@ function updateEcoScore() {
     document.getElementById("ecoScore").textContent = `${ecoScore}/100`;
 }
 
-// 🌟 Ensure the streak updates on page load
 document.addEventListener("DOMContentLoaded", function () {
     updateClimateStreak(); 
 });
 
 function updateClimateStreak() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    let streakElement = document.getElementById("loggingStreak");
-    
-    if (!streakElement) return; // Prevent errors
+    let streakElement = document.getElementById("climateStreakValue");
+
+    if (!streakElement) return;
 
     if (activities.length === 0) {
-        streakElement.textContent = "Climate action streak: 0";
+        streakElement.textContent = "0";
         localStorage.setItem("climateStreak", "0");
         return;
     }
 
-    // 🗓️ Extract unique days when activities were logged
     let activityDates = activities.map(activity => {
         let date = new Date(activity.date);
-        return date.toDateString(); // Normalize to avoid time mismatches
+        return date.toDateString();
     });
 
-    let uniqueDays = [...new Set(activityDates)]; // Remove duplicate days
-    uniqueDays.sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+    let uniqueDays = [...new Set(activityDates)].sort((a, b) => new Date(a) - new Date(b));
 
-    // 🔄 Calculate Streak
-    let streak = 1; // Start with 1 day
-    for (let i = 0; i < uniqueDays.length - 1; i++) {
+    let streak = 1;
+    for (let i = 1; i < uniqueDays.length; i++) {
+        let prevDate = new Date(uniqueDays[i - 1]);
         let currentDate = new Date(uniqueDays[i]);
-        let previousDate = new Date(uniqueDays[i + 1]);
 
-        let diffInDays = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
-        
-        if (diffInDays === 1) {
-            streak++; // Count consecutive day
+        let diff = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+        if (diff === 1) {
+            streak++;
         } else {
-            break; // Streak broken
+            break;
         }
     }
 
-    // 🔥 Save and Update UI
-    streakElement.textContent = `Climate action streak: ${streak}`;
+    streakElement.textContent = streak;
     localStorage.setItem("climateStreak", streak.toString());
 }
 
 
-// 🔮 Function to Toggle "Magic Recommendations"
 function toggleRecommendations(button) {
     let section = document.getElementById("recommendations-container");
     if (!section) return;
@@ -352,8 +345,11 @@ function toggleRecommendations(button) {
 
     makeDraggable(box);
     makeResizable(box);
-    generateRecommendations(); // 🔥 Generate recommendations based on activity log
+
+    // Delay execution to ensure the list exists before updating
+    setTimeout(generateRecommendations, 100);
 }
+
 
 function generateRecommendations() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
@@ -362,48 +358,38 @@ function generateRecommendations() {
     if (!recommendationsList) return;
     recommendationsList.innerHTML = ""; // Clear old recommendations
 
-    // 🚨 If no activities logged, prompt user to log some
     if (activities.length === 0) {
-        let listItem = document.createElement("li");
-        listItem.textContent = "Log some activities to get personalized recommendations!";
-        recommendationsList.appendChild(listItem);
+        recommendationsList.innerHTML = "<li>Log some activities to get personalized recommendations!</li>";
         return;
     }
 
-    // 🌱 Define High-Carbon Activity Recommendations
-    const recommendationMap = {
-        "driving": ["Try carpooling with a colleague or a friend!", "Use public transport for shorter trips.", "Consider biking or walking instead of driving."],
-        "plane": ["Book flights with lower CO₂ emissions.", "Consider train travel for shorter distances.", "Try video conferencing instead of flying for business."],
-        "meat consumption": ["Try a plant-based meal once a week!", "Reduce red meat intake to lower your carbon footprint.", "Buy locally sourced food to cut transportation emissions."],
-        "laundry": ["Wash clothes in cold water to save energy.", "Air dry your clothes instead of using a dryer."],
-        "plastic": ["Carry a reusable water bottle to reduce plastic waste.", "Avoid single-use plastics like bags and straws."],
-        "electricity use": ["Unplug devices when not in use.", "Use LED bulbs to save energy.", "Switch to renewable energy sources if available."]
-    };
-
-    // 🔍 Find the **Highest Carbon Activities**
-    let maxCarbon = Math.max(...activities.map(a => parseFloat(a.carbon) || 0)); // Find the highest carbon value
+    let maxCarbon = Math.max(...activities.map(a => parseFloat(a.carbon) || 0));
 
     if (maxCarbon === 0) {
-        let listItem = document.createElement("li");
-        listItem.textContent = "You're already making great eco-friendly choices!";
-        recommendationsList.appendChild(listItem);
+        recommendationsList.innerHTML = "<li>You're already making great eco-friendly choices!</li>";
         return;
     }
 
     let highCarbonActivities = activities
-        .filter(activity => parseFloat(activity.carbon) === maxCarbon) // Find all activities that match the highest CO₂ output
+        .filter(activity => parseFloat(activity.carbon) === maxCarbon)
         .map(activity => activity.name.toLowerCase());
 
-    // 📝 Provide a Recommendation Based on High Carbon Activities
-    let recommendations = new Set(); // Use a Set to avoid duplicate suggestions
+    const recommendationMap = {
+        "driving": ["Try carpooling!", "Use public transport.", "Consider biking instead."],
+        "plane": ["Book eco-friendly flights.", "Try train travel for short trips.", "Video conferencing instead of flying."],
+        "burger": ["Try a plant-based meal!", "Reduce red meat intake.", "Buy locally sourced food."],
+        "laundry": ["Wash clothes in cold water.", "Air dry instead of using a dryer."],
+        "plastic": ["Carry a reusable bottle.", "Avoid single-use plastics."],
+        "electricity": ["Unplug devices when not in use.", "Use LED bulbs to save energy.", "Switch to renewable energy."]
+    };
 
+    let recommendations = new Set();
     for (let category in recommendationMap) {
         if (highCarbonActivities.some(activity => activity.includes(category))) {
-            recommendationMap[category].forEach(rec => recommendations.add(rec)); // Add all suggestions
+            recommendationMap[category].forEach(rec => recommendations.add(rec));
         }
     }
 
-    // 🔥 Display Recommendations
     if (recommendations.size === 0) {
         recommendationsList.innerHTML = "<li>No specific recommendations found. Keep making eco-friendly choices!</li>";
     } else {
@@ -414,7 +400,6 @@ function generateRecommendations() {
         });
     }
 }
-
 
 
 // 🌍 Function to Toggle "Your World"
@@ -519,44 +504,41 @@ function gptEstimateCarbon(activity) {
 
 function updateClimateStreak() {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
-    let streakElement = document.getElementById("loggingStreak");
-    
-    if (!streakElement) return; // Prevent errors
+    let streakElement = document.getElementById("climateStreakValue");
 
+    if (!streakElement) return;
+
+    // Reset streak if no activities exist
     if (activities.length === 0) {
-        streakElement.textContent = "Climate action streak: 0";
+        streakElement.textContent = "0";
         localStorage.setItem("climateStreak", "0");
         return;
     }
 
-    // 🗓️ Extract unique days when activities were logged
     let activityDates = activities.map(activity => {
         let date = new Date(activity.date);
-        return date.toDateString(); // Normalize to avoid time mismatches
+        return date.toDateString();
     });
 
-    let uniqueDays = [...new Set(activityDates)]; // Remove duplicate days
-    uniqueDays.sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+    let uniqueDays = [...new Set(activityDates)].sort((a, b) => new Date(a) - new Date(b));
 
-    // 🔄 Calculate Streak
-    let streak = 1; // Start with 1 day
-    for (let i = 0; i < uniqueDays.length - 1; i++) {
+    let streak = 1;
+    for (let i = uniqueDays.length - 1; i > 0; i--) {
         let currentDate = new Date(uniqueDays[i]);
-        let previousDate = new Date(uniqueDays[i + 1]);
+        let previousDate = new Date(uniqueDays[i - 1]);
 
-        let diffInDays = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
-        
-        if (diffInDays === 1) {
-            streak++; // Count consecutive day
+        let diff = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+        if (diff === 1) {
+            streak++;
         } else {
-            break; // Streak broken
+            break; // Streak breaks if a day is skipped
         }
     }
 
-    // 🔥 Save and Update UI
-    streakElement.textContent = `Climate action streak: ${streak}`;
+    streakElement.textContent = streak;
     localStorage.setItem("climateStreak", streak.toString());
 }
+
 
 function loadActivities() {
     let activityList = document.getElementById("activityList");
@@ -628,9 +610,11 @@ function deleteActivity(index) {
     let activities = JSON.parse(localStorage.getItem("activities")) || [];
     activities.splice(index, 1);
     localStorage.setItem("activities", JSON.stringify(activities));
+
     loadActivities();
     updateTotalCarbon();
-    updateEcoScore(); // 🌟 Update Eco Score dynamically
+    updateEcoScore();
+    updateClimateStreak(); // ✅ Ensure streak updates when activities are deleted
 }
 
 
